@@ -1,0 +1,81 @@
+## =========================
+## .NET / C#
+## =========================
+
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider / VS Code / Visual Studio
+.vs/
+.vscode/
+.idea/
+
+## =========================
+## Build & logs
+## =========================
+
+*.log
+logs/
+*.tmp
+*.temp
+
+## =========================
+## OS files
+## =========================
+
+.DS_Store
+Thumbs.db
+
+## =========================
+## Environment files (VERY IMPORTANT)
+## =========================
+
+.env
+.env.*
+
+appsettings.Development.json
+
+## =========================
+## Database files
+## =========================
+
+*.db
+*.sqlite
+*.sqlite3
+
+## EF Core migrations snapshot (optional keep or ignore)
+# Migrations/
+
+## =========================
+## Publish output
+## =========================
+
+publish/
+wwwroot/
+
+## =========================
+## Node (if frontend later)
+## =========================
+
+node_modules/
+dist/
+build/
+
+## =========================
+## Sensitive files
+## =========================
+
+secrets.json
+*.pfx
+*.key
+*.pem
+
+## =========================
+## Mac
+## =========================
+
+*.swp
