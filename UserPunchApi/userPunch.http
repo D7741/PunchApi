@@ -1,6 +1,0 @@
-@userPunch_HostAddress = http://localhost:5007
-
-GET {{userPunch_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

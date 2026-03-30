@@ -12,7 +12,7 @@ namespace UserPunchApi.Models
         public int DepartmentId {get; set;}
 
         [Required]
-        public string DepartmentName {get; set;}
+        public string DepartmentName {get; set;} = string.Empty;
 
         public List<User> Users {get; set;} = new();
 

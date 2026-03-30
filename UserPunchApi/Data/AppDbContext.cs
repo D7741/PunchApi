@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using UserPunchApi.Models;
-using EventManagementApi.Models;
 
 namespace UserPunchApi.Data
 {
