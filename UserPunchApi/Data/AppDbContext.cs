@@ -10,11 +10,11 @@ namespace UserPunchApi.Data
         {
         }
 
-        public DbSet<User> Users { get; set; } 
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<PunchRecord> PunchRecords { get; set; }
-        public DbSet<LeaveRequest> LeaveRequests { get; set; }
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Department> Departments => Set<Department>();
+        public DbSet<Schedule> Schedules => Set<Schedule>();
+        public DbSet<PunchRecord> PunchRecords => Set<PunchRecord>();
+        public DbSet<LeaveRequest> LeaveRequests => Set<LeaveRequest>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +36,7 @@ namespace UserPunchApi.Data
                         .HasOne(l => l.User)
                         .WithMany(u => u.LeaveRequests)
                         .HasForeignKey(l => l.UserId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade); //temp for MVP
 
             modelBuilder.Entity<Schedule>()
                         .HasOne(s => s.User)
