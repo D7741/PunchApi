@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace UserPunchApi.Models.DTOs.Auth
+namespace UserPunchApi.Dtos.V1.AuthDtos
+
 {
     public class RefreshTokenDto
     {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserPunchApi.Models.DTOs.Auth;
+using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1
 {
@@ -8,18 +9,27 @@ namespace UserPunchApi.Controllers.V1
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            await Task.CompletedTask;
+            //await Task.CompletedTask;
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // 这里先写死，后面再接数据库
-            if (dto.Email != "manager@test.com" || dto.Password != "123456")
+            // 链接数据库，用service + repo来筛选
+            var result = await _authService.LoginAsync(dto);
+
+            if (result == null)
             {
                 return Unauthorized(new
                 {
@@ -27,55 +37,35 @@ namespace UserPunchApi.Controllers.V1
                 });
             }
 
-            var response = new AuthResponseDto
-            {
-                UserId = 1,
-                FullName = "Test Manager",
-                Email = dto.Email,
-                Role = "Manager",
-                AccessToken = "fake-jwt-access-token",
-                RefreshToken = "fake-refresh-token"
-            };
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            await Task.CompletedTask;
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // 这里以后要查数据库看 email 是否已存在
-            if (dto.Email == "manager@test.com")
+            try
+            {
+                var result = await _authService.RegisterAsync(dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
             {
                 return Conflict(new
                 {
-                    message = "This email is already registered."
+                    message = ex.Message
                 });
             }
-
-            var response = new AuthResponseDto
-            {
-                UserId = 2,
-                FullName = $"{dto.FirstName} {dto.LastName}",
-                Email = dto.Email,
-                Role = dto.Role,
-                AccessToken = "fake-jwt-access-token-for-new-user",
-                RefreshToken = "fake-refresh-token-for-new-user"
-            };
-
-            return Ok(response);
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto dto)
         {
-            await Task.CompletedTask;
+            //await Task.CompletedTask;
 
             if (string.IsNullOrWhiteSpace(dto.RefreshToken))
             {
@@ -85,9 +75,10 @@ namespace UserPunchApi.Controllers.V1
                 });
             }
 
-            // 这里以后改成真正校验 refresh token
-            if (dto.RefreshToken != "fake-refresh-token" &&
-                dto.RefreshToken != "fake-refresh-token-for-new-user")
+            // 这里校验 refresh token
+            var result = await _authService.RefreshTokenAsync(dto);
+
+            if (result == null)
             {
                 return Unauthorized(new
                 {
@@ -95,11 +86,7 @@ namespace UserPunchApi.Controllers.V1
                 });
             }
 
-            return Ok(new
-            {
-                accessToken = "new-fake-jwt-access-token",
-                refreshToken = "new-fake-refresh-token"
-            });
+            return Ok(result);
         }
 
         [HttpPost("logout")]
@@ -121,17 +108,35 @@ namespace UserPunchApi.Controllers.V1
         [Authorize]
         public async Task<IActionResult> GetMe()
         {
-            await Task.CompletedTask;
+            var email = User.FindFirst("email")?.Value;
 
-            var user = new
+            if (string.IsNullOrWhiteSpace(email))
             {
-                id = 1,
-                fullName = User.Identity?.Name ?? "Current User",
-                email = User.FindFirst("email")?.Value ?? "manager@test.com",
-                role = User.FindFirst("role")?.Value ?? "Manager"
-            };
+                return Unauthorized(new
+                {
+                    message = "User not found."
+                });
+            }
 
-            return Ok(user);
+            var user = await _authService.GetByEmailAsync(email);
+
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    message = "User not found."
+                });
+            }
+
+            return Ok(new
+            {
+                id = user.Id,
+                firstName = user.FirstName,
+                lastName = user.LastName,
+                fullName = $"{user.FirstName} {user.LastName}",
+                email = user.Email,
+                role = user.Role
+            });
         }
     }
 }
