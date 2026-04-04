@@ -1,17 +1,25 @@
-namespace Service.Implementations
+using UserPunchApi.Models;
+using UserPunchApi.Dtos.V1.AuthDtos;
+using UserPunchApi.Repositories.Interfaces;
+using UserPunchApi.Repositories.Implementations;
+using UserPunchApi.Services.Interfaces;
+using UserPunchApi.Services.Implementations;
+
+
+namespace UserPunchApi.Services.Implementations
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthRepository _authRepository;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(IAuthRepository authRepository)
         {
-            _userRepository = userRepository;
+            _authRepository = authRepository;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
         {
-            var user = await _userRepository.GetByEmailAsync(dto.Email);
+            var user = await _authRepository.GetByEmailAsync(dto.Email);
 
             if (user == null)
             {
@@ -42,7 +50,7 @@ namespace Service.Implementations
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
         {
-            var emailExists = await _userRepository.EmailExistsAsync(dto.Email);
+            var emailExists = await _authRepository.EmailExistsAsync(dto.Email);
 
             if (emailExists)
             {
@@ -60,7 +68,7 @@ namespace Service.Implementations
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdUser = await _userRepository.CreateAsync(user);
+            var createdUser = await _authRepository.CreateAsync(user);
 
             return new AuthResponseDto
             {
@@ -80,34 +88,44 @@ namespace Service.Implementations
                 return null;
             }
 
-            // 这里先做占位逻辑
-            // 真正版本会去数据库验证 refresh token
             if (!dto.RefreshToken.StartsWith("refresh-token-"))
             {
                 return null;
             }
 
-            var fakeUser = await _userRepository.GetByEmailAsync("manager@test.com");
+            var parts = dto.RefreshToken.Split('-');
 
-            if (fakeUser == null)
+            if (parts.Length < 3)
+            {
+                return null;
+            }
+
+            if (!long.TryParse(parts[2], out var userId))
+            {
+                return null;
+            }
+
+            var user = await _authRepository.GetByIdAsync(userId);
+
+            if (user == null)
             {
                 return null;
             }
 
             return new AuthResponseDto
             {
-                UserId = fakeUser.Id,
-                FullName = $"{fakeUser.FirstName} {fakeUser.LastName}",
-                Email = fakeUser.Email,
-                Role = fakeUser.Role,
-                AccessToken = GenerateFakeAccessToken(fakeUser),
-                RefreshToken = GenerateFakeRefreshToken(fakeUser)
+                UserId = user.Id,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Role = user.Role,
+                AccessToken = GenerateFakeAccessToken(user),
+                RefreshToken = GenerateFakeRefreshToken(user)
             };
         }
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _userRepository.GetByEmailAsync(email);
+            return await _authRepository.GetByEmailAsync(email);
         }
 
         private string GenerateFakeAccessToken(User user)

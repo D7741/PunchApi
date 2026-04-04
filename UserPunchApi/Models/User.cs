@@ -1,39 +1,29 @@
-using UserPunchApi.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserPunchApi.Models
 {
-    public enum UserType {Manager, Employee}
+    public class User
+    {
+        public long Id { get; set; }
 
-    public class User{
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
 
-        [Key]
-        [Required]
-        public long UserId {get; set;}
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
 
-        [Required]    
-        public string UserName {get; set;} = string.Empty;
+        public string Role { get; set; } = "Employee";
 
-        [Required]
-        public string Email {get; set;} = string.Empty;
+        public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Required]
-        public string Password {get; set;} = string.Empty;
+        // build relation between entities.
 
-        public UserType Role {get; set;} = UserType.Employee;
+        public long? DepartmentId { get; set; }
+        public Department? Department { get; set; }
 
-        public int DepartmentId {get; set;}
-
-        public Department? Department {get; set;}
-
-        public List<Schedule> Schedules {get; set;} = new();
-
-        public List<PunchRecord> PunchRecords {get; set;} = new();
-        
-        public List<LeaveRequest> LeaveRequests {get; set;} = new();
- 
+        public ICollection<PunchRecord> PunchRecords { get; set; } = new List<PunchRecord>();
+        public ICollection<LeaveRequest> LeaveRequests { get; set; } = new List<LeaveRequest>();
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }
-
-
 }

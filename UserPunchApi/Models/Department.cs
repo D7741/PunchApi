@@ -9,7 +9,7 @@ namespace UserPunchApi.Models
 
         [Key]
         [Required]
-        public int DepartmentId {get; set;}
+        public long DepartmentId {get; set;}
 
         [Required]
         public string DepartmentName {get; set;} = string.Empty;

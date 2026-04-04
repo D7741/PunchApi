@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UserPunchApi.Models.DTOs.Auth;
+using UserPunchApi.Dtos.V1.AuthDtos;
 using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1
@@ -90,7 +90,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPost("logout")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Logout()
         {
             await Task.CompletedTask;
@@ -105,7 +105,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpGet("me")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetMe()
         {
             var email = User.FindFirst("email")?.Value;

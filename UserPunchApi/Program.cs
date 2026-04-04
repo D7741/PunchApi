@@ -1,5 +1,9 @@
 using UserPunchApi.Data;
 using Microsoft.EntityFrameworkCore;
+using UserPunchApi.Repositories.Interfaces;
+using UserPunchApi.Repositories.Implementations;
+using UserPunchApi.Services.Interfaces;
+using UserPunchApi.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 

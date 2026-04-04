@@ -1,12 +1,15 @@
 using UserPunchApi.Models;
 using UserPunchApi.Data;
-using UserPunchApi.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using UserPunchApi.Repositories.Interfaces;
+using UserPunchApi.Repositories.Implementations;
+using UserPunchApi.Services.Interfaces;
+using UserPunchApi.Services.Implementations;
 
 
 namespace UserPunchApi.Repositories.Implementations
 {
-    public class UserRepository : IUserRepository
+    public class AuthRepository : IAuthRepository
     {
         private readonly AppDbContext _context;
 

@@ -15,7 +15,7 @@ namespace UserPunchApi.Migrations
                 name: "Departments",
                 columns: table => new
                 {
-                    DepartmentId = table.Column<int>(type: "INTEGER", nullable: false)
+                    DepartmentId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     DepartmentName = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -28,17 +28,20 @@ namespace UserPunchApi.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserName = table.Column<string>(type: "TEXT", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false),
-                    Role = table.Column<int>(type: "INTEGER", nullable: false),
-                    DepartmentId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Role = table.Column<string>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DepartmentId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Users_Departments_DepartmentId",
                         column: x => x.DepartmentId,
@@ -66,7 +69,7 @@ namespace UserPunchApi.Migrations
                         name: "FK_LeaveRequests_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -89,12 +92,12 @@ namespace UserPunchApi.Migrations
                         name: "FK_PunchRecords_Users_ModifiedByManagerId",
                         column: x => x.ModifiedByManagerId,
                         principalTable: "Users",
-                        principalColumn: "UserId");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PunchRecords_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -117,12 +120,12 @@ namespace UserPunchApi.Migrations
                         name: "FK_Schedules_Users_CreatedByManagerId",
                         column: x => x.CreatedByManagerId,
                         principalTable: "Users",
-                        principalColumn: "UserId");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Schedules_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

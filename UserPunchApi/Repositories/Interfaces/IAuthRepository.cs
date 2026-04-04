@@ -1,6 +1,8 @@
+using UserPunchApi.Models;
+
 namespace UserPunchApi.Repositories.Interfaces
 {
-    public interface IUserRepository
+    public interface IAuthRepository
     {
         Task<User?> GetByIdAsync(long id);
 
