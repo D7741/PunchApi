@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using UserPunchApi.DTOs.V1.PunchRecordsDtos;
+using UserPunchApi.Dtos.V1.PunchRecordsDtos;
 using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1

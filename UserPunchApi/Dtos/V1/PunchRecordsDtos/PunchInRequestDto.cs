@@ -1,4 +1,4 @@
-namespace UserPunchApi.DTOs.V1.PunchRecordsDtos
+namespace UserPunchApi.Dtos.V1.PunchRecordsDtos
 {
     public class PunchInRequestDto
     {
