@@ -23,8 +23,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add Service and Repositories.
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPunchRecordRepository, PunchRecordRepository>();
+builder.Services.AddScoped<IPunchRecordService, PunchRecordService>();
+
 
 var app = builder.Build();
 

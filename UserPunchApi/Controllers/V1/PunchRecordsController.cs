@@ -1,48 +1,128 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UserPunchApi.DTOs.V1.PunchRecordsDtos;
+using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1
 {
-    [Route("api/v1/punch-records")]
     [ApiController]
-    //[Authorize]
+    [Route("api/v1/punchrecords")]
     public class PunchRecordsController : ControllerBase
     {
-        public PunchRecordsController()
+        private readonly IPunchRecordService _punchRecordService;
+
+        public PunchRecordsController(IPunchRecordService punchRecordService)
         {
+            _punchRecordService = punchRecordService;
         }
 
-        [HttpPost("punch-in")]
-        public async Task<IActionResult> PunchIn([FromBody] object dto)
+        [HttpGet]
+        public async Task<IActionResult> GetAllPunchRecord()
         {
-            return Ok("Punch in success");
+            var records = await _punchRecordService.GetAllPunchRecordAsync();
+
+            var response = records.Select(r => new PunchRecordResponseDto
+            {
+                PunchRecordId = r.PunchRecordId,
+                UserId = r.UserId,
+                PunchInTime = r.PunchInTime,
+                PunchOutTime = r.PunchOutTime,
+                Status = r.PunchOutTime == null ? "Open" : "Closed"
+            });
+
+            return Ok(response);
         }
 
-        [HttpPost("punch-out")]
-        public async Task<IActionResult> PunchOut([FromBody] object dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPunchRecordById(long id)
         {
-            return Ok("Punch out success");
+            var record = await _punchRecordService.GetPunchRecordByIdAsync(id);
+
+            if (record == null)
+            {
+                return NotFound(new { message = "Punch record not found." });
+            }
+
+            var response = new PunchRecordResponseDto
+            {
+                PunchRecordId = record.PunchRecordId,
+                UserId = record.UserId,
+                PunchInTime = record.PunchInTime,
+                PunchOutTime = record.PunchOutTime,
+                Status = record.PunchOutTime == null ? "Open" : "Closed"
+            };
+
+            return Ok(response);
         }
 
-        [HttpPost]
-        //[Authorize(Roles = "Manager")]
-        public async Task<IActionResult> CreatePunchRecord([FromBody] object dto)
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPunchRecordByUserId(long userId)
         {
-            return Ok("Create punch record");
+            var records = await _punchRecordService.GetPunchRecordByUserIdAsync(userId);
+
+            var response = records.Select(r => new PunchRecordResponseDto
+            {
+                PunchRecordId = r.PunchRecordId,
+                UserId = r.UserId,
+                PunchInTime = r.PunchInTime,
+                PunchOutTime = r.PunchOutTime,
+                Status = r.PunchOutTime == null ? "Open" : "Closed"
+            });
+
+            return Ok(response);
         }
 
-        [HttpPatch("{id}")]
-        //[Authorize(Roles = "Manager")]
-        public async Task<IActionResult> UpdatePunchRecord(int id, [FromBody] object dto)
+        [HttpPost("punchin")]
+        public async Task<IActionResult> PunchIn([FromBody] PunchInRequestDto request)
         {
-            return Ok($"Update punch record {id}");
+            var result = await _punchRecordService.PunchInAsync(request.UserId);
+            var record = result.Record;
+
+            if (!result.Success || record == null)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            var response = new PunchRecordResponseDto
+            {
+                PunchRecordId = record.PunchRecordId,
+                UserId = record.UserId,
+                PunchInTime = record.PunchInTime,
+                PunchOutTime = record.PunchOutTime,
+                Status = record.PunchOutTime == null ? "Open" : "Closed"
+            };
+
+            return Ok(new
+            {
+                message = result.Message,
+                data = response
+            });
         }
 
-        [HttpDelete("{id}")]
-        //[Authorize(Roles = "Manager")]
-        public async Task<IActionResult> DeletePunchRecord(int id)
+        [HttpPost("punchout")]
+        public async Task<IActionResult> PunchOut([FromBody] PunchOutRequestDto request)
         {
-            return Ok($"Delete punch record {id}");
+            var result = await _punchRecordService.PunchOutAsync(request.UserId);
+            var record = result.Record;
+
+            if (!result.Success || record == null)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            var response = new PunchRecordResponseDto
+            {
+                PunchRecordId = record.PunchRecordId,
+                UserId = record.UserId,
+                PunchInTime = record.PunchInTime,
+                PunchOutTime = record.PunchOutTime,
+                Status = record.PunchOutTime == null ? "Open" : "Closed"
+            };
+
+            return Ok(new
+            {
+                message = result.Message,
+                data = response
+            });
         }
     }
 }
