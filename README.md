@@ -1,9 +1,8 @@
-# PunchApi
 # 🕒 UserPunchApi (Workforce Management System)
 
-A full-stack workforce management system designed to handle employee scheduling, attendance tracking (punch in/out), and leave management.
+A full-stack workforce management system for managing employees, schedules, attendance (punch records), and leave requests.
 
-This project simulates real-world enterprise systems such as UKG or Workday, focusing on clean backend architecture and scalable design.
+This project is designed to simulate real-world enterprise systems (e.g., UKG / Workday) with a clean backend architecture and scalable design.
 
 ---
 
@@ -13,62 +12,61 @@ This project simulates real-world enterprise systems such as UKG or Workday, foc
 
 * ASP.NET Core Web API (.NET 8)
 * Entity Framework Core
-* SQLite (development)
-* Swagger (API documentation)
+* SQLite (Development Database)
+* Swagger (API Documentation)
 
 ### Frontend (Planned)
 
 * React.js
 * JavaScript / TypeScript
 * REST API integration
-* Responsive UI design
+* Responsive UI
 
 ---
 
-## 📌 Features
+## 📌 Core Features
 
-### ✅ Implemented (Backend)
+### 👤 User Management
 
-#### 👤 User Management
+* Employee and Manager roles
+* User-based relationships with schedules, punch records, and leave requests
 
-* Role-based users (Employee / Manager)
-* Relationships with schedules, punch records, and leave requests
+---
 
-#### 🗓️ Schedule Management
+### 🗓️ Schedule Management
 
-* Create, update, delete schedules
-* Assign schedules to users
-* Track manager who created schedules
-* Retrieve schedules by user
+* Create / update / delete schedules
+* Assign schedules to employees
+* Track which manager created a schedule
+* View schedules by user
 
-#### ⏱️ Punch Records (In Progress)
+---
 
-* Punch in / punch out system
+### ⏱️ Punch Records
+
+* Punch in / punch out functionality
 * Track working sessions
+* Open/closed status handling
 
-#### 📝 Leave Requests (In Progress)
+---
+
+### 📝 Leave Requests
 
 * Submit leave requests
-* Leave types (Annual, Sick, etc.)
-* Status tracking
+* Leave types:
+
+  * Annual Leave
+  * Sick Leave
+  * Carer's Leave
+* Status tracking:
+
+  * Pending
+  * Approved
+  * Rejected
 
 ---
 
-### 🔜 Planned (Frontend)
-
-* User login & dashboard
-* View schedules
-* Punch in/out UI
-* Apply for leave
-* Manager dashboard:
-
-  * Create schedules
-  * Approve leave
-  * Manage employees
-
----
-
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
 This project follows a layered architecture:
 
@@ -76,12 +74,24 @@ This project follows a layered architecture:
 Controller → Service → Repository → DbContext → Database
 ```
 
-### Layers
+### Layer Responsibilities
 
-* **Controller** → Handles HTTP requests
-* **Service** → Business logic & validation
-* **Repository** → Database operations (EF Core)
-* **DTOs** → Data transfer (clean API design)
+* **Controller**
+
+  * Handles HTTP requests & responses
+
+* **Service**
+
+  * Business logic
+  * Validation (e.g. time checks)
+
+* **Repository**
+
+  * Database operations via EF Core
+
+* **DTOs**
+
+  * Clean API input/output models
 
 ---
 
@@ -92,25 +102,50 @@ UserPunchApi/
 │
 ├── Controllers/
 │   └── V1/
+│       ├── UsersController.cs
+│       ├── SchedulesController.cs
+│       ├── PunchRecordsController.cs
+│       └── LeaveRequestsController.cs
+│
 ├── Services/
 │   ├── Interfaces/
 │   └── Implementations/
+│
 ├── Repositories/
 │   ├── Interfaces/
 │   └── Implementations/
+│
 ├── Models/
+│   ├── User.cs
+│   ├── Schedule.cs
+│   ├── PunchRecord.cs
+│   └── LeaveRequest.cs
+│
 ├── DTOs/
 │   └── V1/
+│
 ├── Data/
+│   └── AppDbContext.cs
+│
 ├── Migrations/
 └── Program.cs
 ```
 
 ---
 
-## 🔌 API Endpoints
+## 🔌 API Overview
 
-### Schedule
+### Users
+
+```
+GET    /api/v1/users
+GET    /api/v1/users/{id}
+POST   /api/v1/users
+```
+
+---
+
+### Schedules
 
 ```
 GET    /api/v1/schedules
@@ -124,9 +159,31 @@ DELETE /api/v1/schedules/{id}
 
 ---
 
-## 🧪 Example Request
+### Punch Records
 
-### Create Schedule
+```
+GET    /api/v1/punchrecords
+GET    /api/v1/punchrecords/{id}
+
+POST   /api/v1/punchrecords
+PUT    /api/v1/punchrecords/{id}
+```
+
+---
+
+### Leave Requests
+
+```
+GET    /api/v1/leaverequests
+GET    /api/v1/leaverequests/{id}
+
+POST   /api/v1/leaverequests
+PUT    /api/v1/leaverequests/{id}
+```
+
+---
+
+## 🧪 Example: Create Schedule
 
 ```json
 {
@@ -141,59 +198,69 @@ DELETE /api/v1/schedules/{id}
 
 ---
 
-## ⚠️ Important Notes
+## ⚠️ Important Constraints
 
-* Foreign key constraints enforced:
+* Foreign Keys:
 
-  * `UserId` must exist
+  * `UserId` must exist in Users table
   * `CreatedByManagerId` must exist
+
 * Validation:
 
-  * `EndTime > StartTime`
+  * `EndTime` must be greater than `StartTime`
 
 ---
 
-## 🔐 Security
+## 🔐 Security Considerations
 
-* Input validation via DTOs
-* Business logic validation in Service layer
-* Planned:
+* DTO validation for input safety
+* Business rules enforced in Service layer
+* Planned improvements:
 
   * JWT authentication
-  * Role-based authorization
+  * Role-based authorization (Manager vs Employee)
+  * Data access control
 
 See `SECURITY.md` for vulnerability reporting.
 
 ---
 
-## 📦 Setup
+## 📦 Setup Instructions
 
-### 1. Clone repo
+### 1. Clone repository
 
 ```bash
 git clone <your-repo-url>
 cd UserPunchApi
 ```
 
-### 2. Install
+---
+
+### 2. Install dependencies
 
 ```bash
 dotnet restore
 ```
 
-### 3. Database
+---
+
+### 3. Apply migrations
 
 ```bash
 dotnet ef database update
 ```
 
-### 4. Run
+---
+
+### 4. Run the application
 
 ```bash
 dotnet run
 ```
 
-### 5. Swagger
+---
+
+### 5. Open Swagger
 
 ```
 http://localhost:5007/swagger
@@ -203,11 +270,12 @@ http://localhost:5007/swagger
 
 ## 🧠 Future Improvements
 
-* Schedule conflict detection
-* Role-based permissions
+* Schedule conflict detection (no overlapping shifts)
+* Full role-based access control
 * JWT authentication
-* React frontend
-* Cloud deployment
+* React frontend implementation
+* Cloud deployment (Azure / AWS)
+* Notification system
 
 ---
 
@@ -218,4 +286,16 @@ MIT License
 ---
 
 ## 👨‍💻 Author
-D7741
+
+Pengyu Liu
+
+---
+
+## ⭐ Project Goal
+
+This project demonstrates:
+
+* Clean backend architecture (Controller / Service / Repository)
+* RESTful API design
+* Entity relationships & database modeling
+* Scalable system structure for real-world applications
