@@ -75,26 +75,16 @@ namespace UserPunchApi.Controllers.V1
         public async Task<IActionResult> PunchIn([FromBody] PunchInRequestDto request)
         {
             var result = await _punchRecordService.PunchInAsync(request.UserId);
-            var record = result.Record;
 
-            if (!result.Success || record == null)
+            if (!result.Success || result.Data == null)
             {
                 return BadRequest(new { message = result.Message });
             }
 
-            var response = new PunchRecordResponseDto
-            {
-                PunchRecordId = record.PunchRecordId,
-                UserId = record.UserId,
-                PunchInTime = record.PunchInTime,
-                PunchOutTime = record.PunchOutTime,
-                Status = record.PunchOutTime == null ? "Open" : "Closed"
-            };
-
             return Ok(new
             {
                 message = result.Message,
-                data = response
+                data = result.Data
             });
         }
 
@@ -102,26 +92,16 @@ namespace UserPunchApi.Controllers.V1
         public async Task<IActionResult> PunchOut([FromBody] PunchOutRequestDto request)
         {
             var result = await _punchRecordService.PunchOutAsync(request.UserId);
-            var record = result.Record;
 
-            if (!result.Success || record == null)
+            if (!result.Success || result.Data == null)
             {
                 return BadRequest(new { message = result.Message });
             }
 
-            var response = new PunchRecordResponseDto
-            {
-                PunchRecordId = record.PunchRecordId,
-                UserId = record.UserId,
-                PunchInTime = record.PunchInTime,
-                PunchOutTime = record.PunchOutTime,
-                Status = record.PunchOutTime == null ? "Open" : "Closed"
-            };
-
             return Ok(new
             {
                 message = result.Message,
-                data = response
+                data = result.Data
             });
         }
     }

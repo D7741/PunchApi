@@ -19,9 +19,9 @@ namespace UserPunchApi.Repositories.Implementations
             return await _context.PunchRecords.ToListAsync();
         }
 
-        public async Task<PunchRecord?> GetPunchRecordByIdAsync(long id)
+        public async Task<PunchRecord?> GetPunchRecordByIdAsync(long punchRecordId)
         {
-            return await _context.PunchRecords.FirstOrDefaultAsync(p => p.PunchRecordId == id);
+            return await _context.PunchRecords.FirstOrDefaultAsync(p => p.PunchRecordId == punchRecordId);
         }
 
         public async Task<IEnumerable<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
@@ -39,11 +39,28 @@ namespace UserPunchApi.Repositories.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<PunchRecord> CreateAsync(PunchRecord punchRecord)
+        public async Task<PunchRecord> CreatePunchRecordAsync(PunchRecord punchRecord)
         {
             await _context.PunchRecords.AddAsync(punchRecord);
             await _context.SaveChangesAsync();
             return punchRecord;
+        }
+
+        public async Task<PunchRecord?> UpdatePunchRecordAsync(PunchRecord punchRecord)
+        {
+            var existingRecord = await _context.PunchRecords.FindAsync(punchRecord.PunchRecordId);
+
+            if (existingRecord == null)
+            {
+                return null;
+            }
+
+            existingRecord.UserId = punchRecord.UserId;
+            existingRecord.PunchInTime = punchRecord.PunchInTime;
+            existingRecord.PunchOutTime = punchRecord.PunchOutTime;
+
+            await _context.SaveChangesAsync();
+            return existingRecord;
         }
 
         public async Task SaveChangesAsync()

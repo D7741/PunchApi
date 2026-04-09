@@ -1,16 +1,22 @@
+using UserPunchApi.Common;
+using UserPunchApi.Dtos.V1.PunchRecordsDtos;
 using UserPunchApi.Models;
 using UserPunchApi.Repositories.Interfaces;
 using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Services.Implementations
 {
-    public class PunchRecordService: IPunchRecordService
+    public class PunchRecordService : IPunchRecordService
     {
-        public readonly IPunchRecordRepository _punchRecordRepository;
+        private readonly IPunchRecordRepository _punchRecordRepository;
+        private readonly IAuthRepository _authRepository;
 
-        public PunchRecordService(IPunchRecordRepository punchRecordRepository)
+        public PunchRecordService(
+            IPunchRecordRepository punchRecordRepository,
+            IAuthRepository authRepository)
         {
             _punchRecordRepository = punchRecordRepository;
+            _authRepository = authRepository;
         }
 
         public async Task<IEnumerable<PunchRecord>> GetAllPunchRecordAsync()
@@ -18,9 +24,9 @@ namespace UserPunchApi.Services.Implementations
             return await _punchRecordRepository.GetAllPunchRecordAsync();
         }
 
-        public async Task<PunchRecord?> GetPunchRecordByIdAsync(long id)
+        public async Task<PunchRecord?> GetPunchRecordByIdAsync(long punchRecordId)
         {
-            return await _punchRecordRepository.GetPunchRecordByIdAsync(id);
+            return await _punchRecordRepository.GetPunchRecordByIdAsync(punchRecordId);
         }
 
         public async Task<IEnumerable<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
@@ -28,40 +34,63 @@ namespace UserPunchApi.Services.Implementations
             return await _punchRecordRepository.GetPunchRecordByUserIdAsync(userId);
         }
 
-        public async Task<(bool Success, string Message, PunchRecord? Record)> PunchInAsync(long userId)
+        public async Task<ServiceResult<PunchRecordResponseDto>> PunchInAsync(long userId)
         {
-            var openRecord = await _punchRecordRepository.GetOpenPunchRecordByUserIdAsync(userId);
-
-            if (openRecord != null)
+            var user = await _authRepository.GetByIdAsync(userId);
+            if (user == null)
             {
-                return (false, "User already punched in and has not punched out yet.", null);
+                return ServiceResult<PunchRecordResponseDto>.Fail("User not found.");
             }
 
-            var newRecord = new PunchRecord
+            var openRecord = await _punchRecordRepository.GetOpenPunchRecordByUserIdAsync(userId);
+            if (openRecord != null)
+            {
+                return ServiceResult<PunchRecordResponseDto>.Fail("User already has an open punch record.");
+            }
+
+            var record = new PunchRecord
             {
                 UserId = userId,
                 PunchInTime = DateTime.UtcNow,
                 PunchOutTime = null
             };
 
-            var createdRecord = await _punchRecordRepository.CreateAsync(newRecord);
+            await _punchRecordRepository.CreatePunchRecordAsync(record);
 
-            return (true, "Punch in successful.", createdRecord);
+            var response = new PunchRecordResponseDto
+            {
+                PunchRecordId = record.PunchRecordId,
+                UserId = record.UserId,
+                PunchInTime = record.PunchInTime,
+                PunchOutTime = record.PunchOutTime,
+                Status = "Open"
+            };
+
+            return ServiceResult<PunchRecordResponseDto>.Ok(response, "Punch in successful.");
         }
 
-        public async Task<(bool Success, string Message, PunchRecord? Record)> PunchOutAsync(long userId)
+        public async Task<ServiceResult<PunchRecordResponseDto>> PunchOutAsync(long userId)
         {
             var openRecord = await _punchRecordRepository.GetOpenPunchRecordByUserIdAsync(userId);
-
             if (openRecord == null)
             {
-                return (false, "No active punch-in record found.", null);
+                return ServiceResult<PunchRecordResponseDto>.Fail("No open punch record found.");
             }
 
             openRecord.PunchOutTime = DateTime.UtcNow;
-            await _punchRecordRepository.SaveChangesAsync();
 
-            return (true, "Punch out successful.", openRecord);
+            await _punchRecordRepository.UpdatePunchRecordAsync(openRecord);
+
+            var response = new PunchRecordResponseDto
+            {
+                PunchRecordId = openRecord.PunchRecordId,
+                UserId = openRecord.UserId,
+                PunchInTime = openRecord.PunchInTime,
+                PunchOutTime = openRecord.PunchOutTime,
+                Status = "Closed"
+            };
+
+            return ServiceResult<PunchRecordResponseDto>.Ok(response, "Punch out successful.");
         }
     }
 }
