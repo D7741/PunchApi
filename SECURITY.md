@@ -4,38 +4,46 @@
 
 The following versions of UserPunchApi are currently supported with security updates:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x     | Yes                |
-| < 1.0   | No                 |
+| Version | Supported |
+| ------- | --------- |
+| 1.x     | Yes       |
+| 0.x     | No        |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this project, please report it responsibly.
+Security issues should be reported responsibly and privately.
 
-Please do **not** create a public GitHub issue for security vulnerabilities.
+Please **do not** open a public GitHub issue for security-related problems.
 
-Instead, contact the maintainer directly with the following details:
-- A description of the vulnerability
-- Steps to reproduce the issue
-- The potential impact
-- Any suggested fix, if available
-
-You can report vulnerabilities by email:
+Instead, report the issue by contacting the project maintainer directly at:
 
 **8848rowanliu@gmail.com**
 
-We will try to acknowledge receipt of your report within 7 days and investigate it as soon as possible.
+When reporting a vulnerability, please include:
+- A clear description of the issue
+- Steps to reproduce the problem
+- Affected endpoint(s) or feature(s)
+- Possible impact
+- Suggested mitigation, if known
 
-## Scope
+We will make a best effort to review and respond in a reasonable timeframe.
 
-This security policy applies to:
-- Authentication and authorization logic
-- User data handling
-- API endpoints
-- Database access and data validation
-- Any dependencies used in this project
+## Security Considerations
 
-## Best Effort Statement
+This project handles:
+- User authentication
+- Employee schedule data
+- Punch record information
+- Leave request data
 
-This project is currently under active development. While we take security issues seriously, response times and fixes may vary depending on project status and maintainer availability.
+Special care should be taken when reporting issues related to:
+- Unauthorized access
+- Broken authentication
+- Insecure direct object references
+- Data exposure
+- Improper input validation
+- Database-related vulnerabilities
+
+## Disclosure Policy
+
+Please allow reasonable time for the issue to be investigated and fixed before making any public disclosure.
