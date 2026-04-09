@@ -16,14 +16,14 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllLeaveRequest()
         {
             var requests = await _leaveRequestService.GetAllLeaveRequestAsync();
             return Ok(requests);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(long id)
+        public async Task<IActionResult> GetLeaveRequestById(long id)
         {
             var request = await _leaveRequestService.GetLeaveRequestByIdAsync(id);
 
@@ -34,7 +34,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateLeaveRequestDto dto)
+        public async Task<IActionResult> CreateLeaveRequest([FromBody] CreateLeaveRequestDto dto)
         {
             var created = await _leaveRequestService.CreateLeaveRequestAsync(dto);
 
@@ -42,7 +42,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPut("{id}/approve")]
-        public async Task<IActionResult> Approve(long id)
+        public async Task<IActionResult> ApproveLeaveRequest(long id)
         {
             var result = await _leaveRequestService.ApproveLeaveRequestAsync(id);
 
@@ -53,7 +53,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPut("{id}/reject")]
-        public async Task<IActionResult> Reject(long id)
+        public async Task<IActionResult> RejectLeaveRequest(long id)
         {
             var result = await _leaveRequestService.RejectLeaveRequestAsync(id);
 
