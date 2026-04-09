@@ -29,6 +29,8 @@ builder.Services.AddScoped<IPunchRecordRepository, PunchRecordRepository>();
 builder.Services.AddScoped<IPunchRecordService, PunchRecordService>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 var app = builder.Build();
 

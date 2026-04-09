@@ -20,6 +20,8 @@ namespace UserPunchApi.Models
 
         public DateTime EndTime {get; set;}
 
+        public string ShiftName { get; set; } = string.Empty;
+
         public long? CreatedByManagerId { get; set; }
         
         public User? CreatedByManager { get; set; }

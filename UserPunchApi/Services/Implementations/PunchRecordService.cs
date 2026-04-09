@@ -13,7 +13,7 @@ namespace UserPunchApi.Services.Implementations
             _punchRecordRepository = punchRecordRepository;
         }
 
-        public async Task<List<PunchRecord>> GetAllPunchRecordAsync()
+        public async Task<IEnumerable<PunchRecord>> GetAllPunchRecordAsync()
         {
             return await _punchRecordRepository.GetAllPunchRecordAsync();
         }
@@ -23,7 +23,7 @@ namespace UserPunchApi.Services.Implementations
             return await _punchRecordRepository.GetPunchRecordByIdAsync(id);
         }
 
-        public async Task<List<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
+        public async Task<IEnumerable<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
         {
             return await _punchRecordRepository.GetPunchRecordByUserIdAsync(userId);
         }

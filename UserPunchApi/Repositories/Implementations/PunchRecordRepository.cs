@@ -14,7 +14,7 @@ namespace UserPunchApi.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<List<PunchRecord>> GetAllPunchRecordAsync()
+        public async Task<IEnumerable<PunchRecord>> GetAllPunchRecordAsync()
         {
             return await _context.PunchRecords.ToListAsync();
         }
@@ -24,7 +24,7 @@ namespace UserPunchApi.Repositories.Implementations
             return await _context.PunchRecords.FirstOrDefaultAsync(p => p.PunchRecordId == id);
         }
 
-        public async Task<List<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
+        public async Task<IEnumerable<PunchRecord>> GetPunchRecordByUserIdAsync(long userId)
         {
             return await _context.PunchRecords
                 .Where(p => p.UserId == userId)
