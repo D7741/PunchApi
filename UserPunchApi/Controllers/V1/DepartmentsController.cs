@@ -61,7 +61,7 @@ namespace UserPunchApi.Controllers.V1
                 DepartmentName = created.DepartmentName
             };
 
-            return CreatedAtAction(nameof(GetById), new { id = created.DepartmentId }, response);
+            return CreatedAtAction(nameof(GetDepartmentById), new { id = created.DepartmentId }, response);
         }
 
         [HttpPut("{id}")]

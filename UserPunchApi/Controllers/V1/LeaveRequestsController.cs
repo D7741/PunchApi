@@ -38,7 +38,7 @@ namespace UserPunchApi.Controllers.V1
         {
             var created = await _leaveRequestService.CreateLeaveRequestAsync(dto);
 
-            return CreatedAtAction(nameof(GetById), new { id = created.LeaveRequestId }, created);
+            return CreatedAtAction(nameof(GetLeaveRequestById), new { id = created.LeaveRequestId }, created);
         }
 
         [HttpPut("{id}/approve")]
