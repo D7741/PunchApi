@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using UserPunchApi.Common;
 
 namespace UserPunchApi.Dtos.V1.AuthDtos
 {
@@ -21,9 +22,8 @@ namespace UserPunchApi.Dtos.V1.AuthDtos
         public string Password { get; set; } = string.Empty;
 
         [Required]
-        public string Role { get; set; } = "Employee";
-
-        [Required]
-        public string Department {get; set;} = string.Empty;
+        [AllowedValues(Roles.Manager, Roles.Employee,
+            ErrorMessage = "Role must be 'Manager' or 'Employee'.")]
+        public string Role { get; set; } = Roles.Employee;
     }
 }

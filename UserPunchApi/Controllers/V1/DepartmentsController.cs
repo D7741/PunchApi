@@ -1,12 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UserPunchApi.Common;
 using UserPunchApi.Dtos.V1.DepartmentDtos;
 using UserPunchApi.Models;
 using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1
 {
+    // Departments are an admin concern — only managers can manage them.
     [ApiController]
     [Route("api/v1/departments")]
+    [Authorize(Roles = Roles.Manager)]
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
@@ -36,42 +40,31 @@ namespace UserPunchApi.Controllers.V1
             var department = await _departmentService.GetDepartmentByIdAsync(id);
             if (department == null) return NotFound();
 
-            var response = new DepartmentResponseDto
+            return Ok(new DepartmentResponseDto
             {
                 DepartmentId = department.DepartmentId,
                 DepartmentName = department.DepartmentName
-            };
-
-            return Ok(response);
+            });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDepartment(CreateDepartmentDto dto)
+        public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentDto dto)
         {
-            var department = new Department
-            {
-                DepartmentName = dto.DepartmentName
-            };
-
+            var department = new Department { DepartmentName = dto.DepartmentName };
             var created = await _departmentService.CreateDepartmentAsync(department);
 
-            var response = new DepartmentResponseDto
-            {
-                DepartmentId = created.DepartmentId,
-                DepartmentName = created.DepartmentName
-            };
-
-            return CreatedAtAction(nameof(GetDepartmentById), new { id = created.DepartmentId }, response);
+            return CreatedAtAction(nameof(GetDepartmentById), new { id = created.DepartmentId },
+                new DepartmentResponseDto
+                {
+                    DepartmentId = created.DepartmentId,
+                    DepartmentName = created.DepartmentName
+                });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDepartment(long id, CreateDepartmentDto dto)
+        public async Task<IActionResult> UpdateDepartment(long id, [FromBody] CreateDepartmentDto dto)
         {
-            var department = new Department
-            {
-                DepartmentName = dto.DepartmentName
-            };
-
+            var department = new Department { DepartmentName = dto.DepartmentName };
             var updated = await _departmentService.UpdateDepartmentAsync(id, department);
             if (updated == null) return NotFound();
 
@@ -87,7 +80,6 @@ namespace UserPunchApi.Controllers.V1
         {
             var deleted = await _departmentService.DeleteDepartmentAsync(id);
             if (!deleted) return NotFound();
-
             return NoContent();
         }
     }

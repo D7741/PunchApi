@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UserPunchApi.Common;
 using UserPunchApi.Dtos.V1.SchedulesDtos;
 using UserPunchApi.Models;
 using UserPunchApi.Services.Interfaces;
@@ -7,6 +9,7 @@ namespace UserPunchApi.Controllers.V1
 {
     [ApiController]
     [Route("api/v1/schedules")]
+    [Authorize]
     public class SchedulesController : ControllerBase
     {
         private readonly IScheduleService _scheduleService;
@@ -16,7 +19,9 @@ namespace UserPunchApi.Controllers.V1
             _scheduleService = scheduleService;
         }
 
+        // Managers view and manage all schedules.
         [HttpGet]
+        [Authorize(Roles = Roles.Manager)]
         public async Task<IActionResult> GetAllSchedules()
         {
             var schedules = await _scheduleService.GetAllSchedulesAsync();
@@ -35,15 +40,14 @@ namespace UserPunchApi.Controllers.V1
             return Ok(response);
         }
 
+        // An employee can look up a specific schedule entry.
         [HttpGet("{id}")]
         public async Task<IActionResult> GetScheduleById(long id)
         {
             var schedule = await _scheduleService.GetScheduleByIdAsync(id);
 
             if (schedule == null)
-            {
                 return NotFound(new { message = $"Schedule with ID {id} not found." });
-            }
 
             var response = new ScheduleResponseDto
             {
@@ -59,6 +63,7 @@ namespace UserPunchApi.Controllers.V1
             return Ok(response);
         }
 
+        // An employee can look up their own schedule.
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetSchedulesByUserId(long userId)
         {
@@ -78,13 +83,13 @@ namespace UserPunchApi.Controllers.V1
             return Ok(response);
         }
 
+        // Only managers can create, update, or delete schedules.
         [HttpPost]
+        [Authorize(Roles = Roles.Manager)]
         public async Task<IActionResult> CreateSchedule([FromBody] CreateScheduleDto dto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var schedule = new Schedule
             {
@@ -120,12 +125,11 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.Manager)]
         public async Task<IActionResult> UpdateSchedule(long id, [FromBody] UpdateScheduleDto dto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var schedule = new Schedule
             {
@@ -142,9 +146,7 @@ namespace UserPunchApi.Controllers.V1
                 var updatedSchedule = await _scheduleService.UpdateScheduleAsync(id, schedule);
 
                 if (updatedSchedule == null)
-                {
                     return NotFound(new { message = $"Schedule with ID {id} not found." });
-                }
 
                 var response = new ScheduleResponseDto
                 {
@@ -166,16 +168,15 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.Manager)]
         public async Task<IActionResult> DeleteSchedule(long id)
         {
             var deleted = await _scheduleService.DeleteScheduleAsync(id);
 
             if (!deleted)
-            {
                 return NotFound(new { message = $"Schedule with ID {id} not found." });
-            }
 
-            return Ok(new { message = $"Schedule with ID {id} deleted successfully." });
+            return NoContent();
         }
     }
 }

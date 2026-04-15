@@ -90,7 +90,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPost("logout")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await Task.CompletedTask;
@@ -105,9 +105,11 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpGet("me")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetMe()
         {
+            // "email" matches the JwtRegisteredClaimNames.Email key we used in JwtTokenService.
+            // Because we set MapInboundClaims = false in Program.cs, the name is preserved as-is.
             var email = User.FindFirst("email")?.Value;
 
             if (string.IsNullOrWhiteSpace(email))

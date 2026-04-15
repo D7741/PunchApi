@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using UserPunchApi.Common;
 
 namespace UserPunchApi.Models
 {
@@ -28,6 +29,6 @@ namespace UserPunchApi.Models
 
         public Reason LeaveReason { get; set; } = Reason.Person_Carers;
 
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = LeaveRequestStatus.Pending;
     }
 }

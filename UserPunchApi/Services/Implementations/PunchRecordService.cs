@@ -63,7 +63,7 @@ namespace UserPunchApi.Services.Implementations
                 UserId = record.UserId,
                 PunchInTime = record.PunchInTime,
                 PunchOutTime = record.PunchOutTime,
-                Status = "Open"
+                Status = PunchRecordStatus.Open
             };
 
             return ServiceResult<PunchRecordResponseDto>.Ok(response, "Punch in successful.");
@@ -87,7 +87,7 @@ namespace UserPunchApi.Services.Implementations
                 UserId = openRecord.UserId,
                 PunchInTime = openRecord.PunchInTime,
                 PunchOutTime = openRecord.PunchOutTime,
-                Status = "Closed"
+                Status = PunchRecordStatus.Closed
             };
 
             return ServiceResult<PunchRecordResponseDto>.Ok(response, "Punch out successful.");

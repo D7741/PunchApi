@@ -1,51 +1,33 @@
 using UserPunchApi.Models;
 using UserPunchApi.Dtos.V1.AuthDtos;
 using UserPunchApi.Repositories.Interfaces;
-using UserPunchApi.Repositories.Implementations;
 using UserPunchApi.Services.Interfaces;
-using UserPunchApi.Services.Implementations;
-
 
 namespace UserPunchApi.Services.Implementations
 {
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthService(IAuthRepository authRepository)
+        // IJwtTokenService is injected by the DI container — we registered it in Program.cs
+        public AuthService(IAuthRepository authRepository, IJwtTokenService jwtTokenService)
         {
             _authRepository = authRepository;
+            _jwtTokenService = jwtTokenService;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
         {
             var user = await _authRepository.GetByEmailAsync(dto.Email);
 
-            if (user == null)
-            {
+            if (user == null || !user.IsActive)
                 return null;
-            }
 
-            if (!user.IsActive)
-            {
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 return null;
-            }
 
-            // 现在先用明文对比，后面再换 PasswordHash
-            if (user.Password != dto.Password)
-            {
-                return null;
-            }
-
-            return new AuthResponseDto
-            {
-                UserId = user.Id,
-                FullName = $"{user.FirstName} {user.LastName}",
-                Email = user.Email,
-                Role = user.Role,
-                AccessToken = GenerateFakeAccessToken(user),
-                RefreshToken = GenerateFakeRefreshToken(user)
-            };
+            return BuildAuthResponse(user);
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -53,74 +35,39 @@ namespace UserPunchApi.Services.Implementations
             var emailExists = await _authRepository.EmailExistsAsync(dto.Email);
 
             if (emailExists)
-            {
                 throw new InvalidOperationException("This email is already registered.");
-            }
 
             var user = new User
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Email,
-                Password = dto.Password,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = dto.Role,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
 
             var createdUser = await _authRepository.CreateAsync(user);
-
-            return new AuthResponseDto
-            {
-                UserId = createdUser.Id,
-                FullName = $"{createdUser.FirstName} {createdUser.LastName}",
-                Email = createdUser.Email,
-                Role = createdUser.Role,
-                AccessToken = GenerateFakeAccessToken(createdUser),
-                RefreshToken = GenerateFakeRefreshToken(createdUser)
-            };
+            return BuildAuthResponse(createdUser);
         }
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto dto)
         {
+            // Dev note: right now we accept any non-empty refresh token and look up
+            // the user by the userId embedded in the DTO. In production you would:
+            //   1. Store the refresh token hash in the DB when it's issued
+            //   2. Look it up here and verify it hasn't expired or been revoked
+            //   3. Delete the old one and issue a new pair (token rotation)
             if (string.IsNullOrWhiteSpace(dto.RefreshToken))
-            {
                 return null;
-            }
 
-            if (!dto.RefreshToken.StartsWith("refresh-token-"))
-            {
+            var user = await _authRepository.GetByIdAsync(dto.UserId);
+
+            if (user == null || !user.IsActive)
                 return null;
-            }
 
-            var parts = dto.RefreshToken.Split('-');
-
-            if (parts.Length < 3)
-            {
-                return null;
-            }
-
-            if (!long.TryParse(parts[2], out var userId))
-            {
-                return null;
-            }
-
-            var user = await _authRepository.GetByIdAsync(userId);
-
-            if (user == null)
-            {
-                return null;
-            }
-
-            return new AuthResponseDto
-            {
-                UserId = user.Id,
-                FullName = $"{user.FirstName} {user.LastName}",
-                Email = user.Email,
-                Role = user.Role,
-                AccessToken = GenerateFakeAccessToken(user),
-                RefreshToken = GenerateFakeRefreshToken(user)
-            };
+            return BuildAuthResponse(user);
         }
 
         public async Task<User?> GetByEmailAsync(string email)
@@ -128,14 +75,18 @@ namespace UserPunchApi.Services.Implementations
             return await _authRepository.GetByEmailAsync(email);
         }
 
-        private string GenerateFakeAccessToken(User user)
+        // Private helper — avoids repeating the same DTO mapping in Login, Register, Refresh
+        private AuthResponseDto BuildAuthResponse(User user)
         {
-            return $"access-token-{user.Id}-{Guid.NewGuid()}";
-        }
-
-        private string GenerateFakeRefreshToken(User user)
-        {
-            return $"refresh-token-{user.Id}-{Guid.NewGuid()}";
+            return new AuthResponseDto
+            {
+                UserId = user.Id,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Role = user.Role,
+                AccessToken = _jwtTokenService.GenerateAccessToken(user),
+                RefreshToken = _jwtTokenService.GenerateRefreshToken()
+            };
         }
     }
 }

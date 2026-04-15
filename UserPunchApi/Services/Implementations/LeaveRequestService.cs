@@ -1,3 +1,4 @@
+using UserPunchApi.Common;
 using UserPunchApi.Dtos.V1.LeaveRequestsDtos;
 using UserPunchApi.Models;
 using UserPunchApi.Repositories.Interfaces;
@@ -55,7 +56,7 @@ namespace UserPunchApi.Services.Implementations
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 LeaveReason = dto.LeaveReason,
-                Status = "Pending"
+                Status = LeaveRequestStatus.Pending
             };
 
             await _leaveRequestRepository.AddLeaveRequestAsync(leaveRequest);
@@ -79,7 +80,7 @@ namespace UserPunchApi.Services.Implementations
             if (leaveRequest == null)
                 return false;
 
-            leaveRequest.Status = "Approved";
+            leaveRequest.Status = LeaveRequestStatus.Approved;
 
             await _leaveRequestRepository.UpdateLeaveRequestAsync(leaveRequest);
             return await _leaveRequestRepository.SaveChangesAsync();
@@ -92,7 +93,7 @@ namespace UserPunchApi.Services.Implementations
             if (leaveRequest == null)
                 return false;
 
-            leaveRequest.Status = "Rejected";
+            leaveRequest.Status = LeaveRequestStatus.Rejected;
 
             await _leaveRequestRepository.UpdateLeaveRequestAsync(leaveRequest);
             return await _leaveRequestRepository.SaveChangesAsync();

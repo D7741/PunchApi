@@ -1,12 +1,17 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UserPunchApi.Common;
 using UserPunchApi.Dtos.V1.UserDtos;
 using UserPunchApi.Models;
 using UserPunchApi.Services.Interfaces;
 
 namespace UserPunchApi.Controllers.V1
 {
+    // Every endpoint in this controller requires a Manager role.
+    // Only managers should be able to create, update, or delete user accounts.
     [ApiController]
     [Route("api/v1/users")]
+    [Authorize(Roles = Roles.Manager)]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -60,14 +65,14 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser(CreateUserDto dto)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
         {
             var user = new User
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Email,
-                Password = dto.Password,
+                PasswordHash = dto.Password,
                 Role = dto.Role,
                 IsActive = dto.IsActive,
                 DepartmentId = dto.DepartmentId
@@ -75,9 +80,7 @@ namespace UserPunchApi.Controllers.V1
 
             var createdUser = await _userService.CreateUserAsync(user);
             if (createdUser == null)
-            {
                 return BadRequest("Email already exists.");
-            }
 
             var response = new UserResponseDto
             {
@@ -96,7 +99,7 @@ namespace UserPunchApi.Controllers.V1
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(long id, UpdateUserDto dto)
+        public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserDto dto)
         {
             var user = new User
             {
@@ -110,9 +113,7 @@ namespace UserPunchApi.Controllers.V1
 
             var updatedUser = await _userService.UpdateUserAsync(id, user);
             if (updatedUser == null)
-            {
                 return NotFound("User not found or email already in use.");
-            }
 
             var response = new UserResponseDto
             {
