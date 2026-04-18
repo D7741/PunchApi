@@ -1,156 +1,85 @@
-# UserPunch — Workforce Management System
+# 🚀 UserPunch — Workforce Management System
 
-A full-stack workforce management MVP for handling employee scheduling, attendance, and leave requests — built with ASP.NET Core 8 and React 19.
+A full-stack **workforce management MVP** designed for employee scheduling, attendance tracking, and leave management.
 
----
-
-## Features
-
-### All Authenticated Users
-- **Punch in / Punch out** — clock in and out from the dashboard with live status
-- **Leave requests** — submit requests and track their approval status
-- **Schedule** — view assigned shifts on an interactive calendar
-
-### Managers Only
-- **Schedule management** — assign shifts to employees via a calendar (click a date to create, click a shift to delete)
-- **Leave approvals** — approve or reject pending employee leave requests
-- **User management** — view all registered users, roles, and departments
+Built with **ASP.NET Core 8** (backend) and **React 19 + Vite** (frontend), this project demonstrates clean architecture, role-based access control, and scalable design.
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+### 👤 Employee (All Authenticated Users)
+
+- **Punch In / Punch Out**  
+  Clock in and out from the dashboard with real-time status updates.
+
+- **Leave Requests**  
+  Submit leave requests and track approval status.
+
+- **Schedule Viewing**  
+  View assigned shifts in a calendar-based interface.
+
+---
+
+### 👨‍💼 Manager
+
+- **Schedule Management**  
+  Create, update, and assign shifts via calendar.
+
+- **Leave Approvals**  
+  Approving or rejecting pending leave requests.
+
+- **User Management**  
+  View and manage users, roles, and departments.
+
+---
+
+## 🛠 Tech Stack
 
 ### Backend
-| | |
-|---|---|
+
+| Category | Technology |
+|--------|----------|
 | Framework | ASP.NET Core 8 Web API |
 | ORM | Entity Framework Core 8 |
 | Database | SQLite |
-| Auth | JWT Bearer (HMAC-SHA256) |
-| Passwords | BCrypt |
-| Docs | Swagger / OpenAPI |
+| Authentication | JWT Bearer (HMAC-SHA256) |
+| Password Hashing | BCrypt |
+| API Docs | Swagger / OpenAPI |
+
+---
 
 ### Frontend
-| | |
-|---|---|
-| Framework | React 19 + Vite 8 |
+
+| Category | Technology |
+|--------|----------|
+| Framework | React 19 + Vite |
 | Routing | React Router v7 |
-| State | Zustand |
-| HTTP | Axios (with auth interceptor) |
+| State Management | Zustand |
+| HTTP Client | Axios (with auth interceptor) |
 | Calendar | React Big Calendar + date-fns |
-| Styles | Plain CSS with CSS variables |
+| Styling | Plain CSS (CSS variables) |
 
 ---
 
-## Project Structure
-
-```
-userPunch/
-├── UserPunchApi/                  # ASP.NET Core backend
-│   ├── Controllers/V1/            # Auth, Users, PunchRecords, Schedules, LeaveRequests, Departments
-│   ├── Services/
-│   │   ├── Interfaces/
-│   │   └── Implementations/
-│   ├── Repositories/
-│   │   ├── Interfaces/
-│   │   └── Implementations/
-│   ├── Models/                    # User, PunchRecord, Schedule, LeaveRequest, Department
-│   ├── Dtos/V1/                   # Input/output models per domain
-│   ├── Common/                    # Roles, status constants, ServiceResult
-│   ├── Data/                      # AppDbContext
-│   ├── Migrations/
-│   └── Program.cs
-│
-└── frontend/                      # React frontend
-    └── src/
-        ├── api/                   # axiosClient + one file per domain
-        ├── components/
-        │   ├── layout/            # AppLayout, Sidebar
-        │   └── common/            # ProtectedRoute, RoleRoute
-        ├── pages/                 # One file per page/route
-        ├── store/                 # authStore (Zustand)
-        ├── utils/                 # token.js, formatDate.js
-        └── styles/                # global.css
-```
-
----
-
-## API Reference
-
-### Auth — `/api/v1/auth`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/login` | Public | Email + password → JWT |
-| POST | `/register` | Public | Create account |
-| GET | `/me` | Authenticated | Current user info |
-
-### Punch Records — `/api/v1/punchrecords`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/` | Manager | All records |
-| GET | `/user/{userId}` | Authenticated | Records for a user |
-| POST | `/punchin` | Authenticated | Clock in |
-| POST | `/punchout` | Authenticated | Clock out |
-
-### Leave Requests — `/api/v1/leaverequests`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/` | Manager | All requests |
-| GET | `/my` | Authenticated | Own requests |
-| POST | `/` | Authenticated | Submit request |
-| PUT | `/{id}/approve` | Manager | Approve |
-| PUT | `/{id}/reject` | Manager | Reject |
-
-### Schedules — `/api/v1/schedules`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/` | Manager | All schedules |
-| GET | `/user/{userId}` | Authenticated | Schedules for a user |
-| POST | `/` | Manager | Create shift |
-| PUT | `/{id}` | Manager | Update shift |
-| DELETE | `/{id}` | Manager | Delete shift |
-
-### Users — `/api/v1/users`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/` | Authenticated | All users |
-| GET | `/{id}` | Authenticated | User by ID |
-| POST | `/` | Manager | Create user |
-| PUT | `/{id}` | Manager | Update user |
-| DELETE | `/{id}` | Manager | Delete user |
-
----
-
-## Frontend Routes
-
-| Route | Access | Page |
-|-------|--------|------|
-| `/login` | Public | Login |
-| `/dashboard` | Authenticated | Punch in/out + recent records |
-| `/leave-requests` | Authenticated | Leave request list + approval (managers) |
-| `/leave-requests/new` | Employee | Submit new leave request |
-| `/schedule` | Employee | Personal shift calendar |
-| `/admin/users` | Manager | User list |
-| `/admin/schedules` | Manager | Schedule management calendar |
-
----
-
-## Getting Started
+## ⚙️ Getting Started
 
 ### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- [Node.js 18+](https://nodejs.org/)
 
-### 1. Clone the repo
+- .NET 8 SDK  
+- Node.js 18+
+
+---
+
+### 1. Clone the Repository
+
 ```bash
 git clone <your-repo-url>
 cd userPunch
-```
+2. Configure Backend
 
-### 2. Configure the backend
+Edit UserPunchApi/appsettings.json:
 
-Edit `UserPunchApi/appsettings.json`:
-```json
 {
   "Jwt": {
     "Key": "replace-with-a-strong-secret-at-least-32-chars",
@@ -159,78 +88,97 @@ Edit `UserPunchApi/appsettings.json`:
     "ExpiryMinutes": 60
   }
 }
-```
-
-### 3. Run the backend
-```bash
+3. Run Backend
 cd UserPunchApi
 dotnet restore
 dotnet ef database update
 dotnet run
-```
-API runs on `http://localhost:5007`  
-Swagger UI: `http://localhost:5007/swagger`
-
-### 4. Run the frontend
-```bash
+API: http://localhost:5007
+Swagger: http://localhost:5007/swagger
+4. Run Frontend
 cd frontend
 npm install
 npm run dev
-```
-App runs on `http://localhost:5173`
+App: http://localhost:5173
 
-> If Vite picks a different port, update the CORS origin in `UserPunchApi/Program.cs` to match.
+⚠️ If Vite uses a different port, update CORS settings in Program.cs.
 
----
+5. Create Test Account
 
-## Authentication
+Use Swagger or send request:
 
-- Login returns a JWT stored in `localStorage`
-- Axios automatically attaches `Authorization: Bearer <token>` on every request
-- 401 responses clear the session and redirect to `/login`
-- Two roles: **Employee** (default) and **Manager**
-- Role-based access enforced on both backend (`[Authorize(Roles)]`) and frontend (`RoleRoute`)
-
----
-
-## Architecture
-
-```
+POST /api/v1/auth/register
+{
+  "email": "manager@test.com",
+  "password": "Test123!",
+  "firstName": "Test",
+  "lastName": "Manager",
+  "role": "Manager"
+}
+📡 API Overview
+🔐 Auth — /api/v1/auth
+Method	Endpoint	Access	Description
+POST	/login	Public	Authenticate and return JWT
+POST	/register	Public	Create new user
+GET	/me	Authenticated	Get current user
+⏱ Punch Records — /api/v1/punchrecords
+Method	Endpoint	Access	Description
+GET	/	Manager	Get all records
+GET	/user/{userId}	Authenticated	Get user records
+POST	/punchin	Authenticated	Clock in
+POST	/punchout	Authenticated	Clock out
+📝 Leave Requests — /api/v1/leaverequests
+Method	Endpoint	Access	Description
+GET	/	Manager	All requests
+GET	/my	Authenticated	Own requests
+POST	/	Authenticated	Submit request
+PUT	/{id}/approve	Manager	Approve
+PUT	/{id}/reject	Manager	Reject
+📅 Schedules — /api/v1/schedules
+Method	Endpoint	Access	Description
+GET	/	Manager	All schedules
+GET	/user/{userId}	Authenticated	User schedules
+POST	/	Manager	Create shift
+PUT	/{id}	Manager	Update shift
+DELETE	/{id}	Manager	Delete shift
+👥 Users — /api/v1/users
+Method	Endpoint	Access	Description
+GET	/	Authenticated	All users
+GET	/{id}	Authenticated	Get user
+POST	/	Manager	Create user
+PUT	/{id}	Manager	Update user
+DELETE	/{id}	Manager	Soft delete
+🔐 Authentication & Authorization
+JWT stored in localStorage
+Axios automatically attaches Authorization: Bearer <token>
+401 responses trigger logout and redirect to /login
+Role-based access:
+Employee
+Manager
+Enforced on:
+Backend ([Authorize(Roles)])
+Frontend (ProtectedRoute, RoleRoute)
+🏗 Architecture Overview
 HTTP Request
-    │
-    ▼
-Controller        ← validates input, extracts JWT claims
-    │
-    ▼
-Service           ← business logic, validation rules
-    │
-    ▼
-Repository        ← EF Core queries
-    │
-    ▼
+   ↓
+Controller     → Input validation + JWT parsing
+   ↓
+Service        → Business logic
+   ↓
+Repository     → Data access (EF Core)
+   ↓
 AppDbContext → SQLite
-```
+🔮 Future Improvements
+Refresh token support
+Schedule conflict detection
+Pagination for large datasets
+Email notifications for leave approvals
+Cloud deployment (Vercel / Railway / AWS)
+Docker support
+👤 Author
 
----
+Pengyu Liu
 
-## Potential Next Steps
-
-- Shift conflict detection (prevent overlapping schedules)
-- Pagination on long lists
-- Email/push notifications for leave approvals
-- Reporting & analytics dashboard
-- Cloud deployment (Azure App Service + Azure SQL)
-- Refresh token rotation
-- Docker support
-
----
-
-## Author
-
-**Pengyu Liu**
-
----
-
-## License
+📄 License
 
 MIT
