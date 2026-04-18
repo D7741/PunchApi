@@ -149,3 +149,32 @@ input, select, textarea {
 .badge-rejected { background: #fee2e2; color: #991b1b; }
 .badge-open     { background: #dbeafe; color: #1e40af; }
 .badge-closed   { background: #f1f5f9; color: #475569; }
+
+/* react-big-calendar overrides */
+.rbc-calendar {
+  font-family: inherit;
+  font-size: 13px;
+}
+.rbc-toolbar button {
+  font-family: inherit;
+  font-size: 13px;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.rbc-toolbar button.rbc-active,
+.rbc-toolbar button:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.rbc-today {
+  background-color: #eff6ff;
+}
+.rbc-off-range-bg {
+  background-color: #f8fafc;
+}
+.rbc-header {
+  font-weight: 500;
+  color: var(--color-text-muted);
+  padding: 6px 0;
+}
