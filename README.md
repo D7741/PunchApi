@@ -1,301 +1,236 @@
-# 🕒 UserPunchApi (Workforce Management System)
+# UserPunch — Workforce Management System
 
-A full-stack workforce management system for managing employees, schedules, attendance (punch records), and leave requests.
-
-This project is designed to simulate real-world enterprise systems (e.g., UKG / Workday) with a clean backend architecture and scalable design.
+A full-stack workforce management MVP for handling employee scheduling, attendance, and leave requests — built with ASP.NET Core 8 and React 19.
 
 ---
 
-## 🚀 Tech Stack
+## Features
+
+### All Authenticated Users
+- **Punch in / Punch out** — clock in and out from the dashboard with live status
+- **Leave requests** — submit requests and track their approval status
+- **Schedule** — view assigned shifts on an interactive calendar
+
+### Managers Only
+- **Schedule management** — assign shifts to employees via a calendar (click a date to create, click a shift to delete)
+- **Leave approvals** — approve or reject pending employee leave requests
+- **User management** — view all registered users, roles, and departments
+
+---
+
+## Tech Stack
 
 ### Backend
+| | |
+|---|---|
+| Framework | ASP.NET Core 8 Web API |
+| ORM | Entity Framework Core 8 |
+| Database | SQLite |
+| Auth | JWT Bearer (HMAC-SHA256) |
+| Passwords | BCrypt |
+| Docs | Swagger / OpenAPI |
 
-* ASP.NET Core Web API (.NET 8)
-* Entity Framework Core
-* SQLite (Development Database)
-* Swagger (API Documentation)
-
-### Frontend (Planned)
-
-* React.js
-* JavaScript / TypeScript
-* REST API integration
-* Responsive UI
-
----
-
-## 📌 Core Features
-
-### 👤 User Management
-
-* Employee and Manager roles
-* User-based relationships with schedules, punch records, and leave requests
+### Frontend
+| | |
+|---|---|
+| Framework | React 19 + Vite 8 |
+| Routing | React Router v7 |
+| State | Zustand |
+| HTTP | Axios (with auth interceptor) |
+| Calendar | React Big Calendar + date-fns |
+| Styles | Plain CSS with CSS variables |
 
 ---
 
-### 🗓️ Schedule Management
-
-* Create / update / delete schedules
-* Assign schedules to employees
-* Track which manager created a schedule
-* View schedules by user
-
----
-
-### ⏱️ Punch Records
-
-* Punch in / punch out functionality
-* Track working sessions
-* Open/closed status handling
-
----
-
-### 📝 Leave Requests
-
-* Submit leave requests
-* Leave types:
-
-  * Annual Leave
-  * Sick Leave
-  * Carer's Leave
-* Status tracking:
-
-  * Pending
-  * Approved
-  * Rejected
-
----
-
-## 🏗️ System Architecture
-
-This project follows a layered architecture:
+## Project Structure
 
 ```
-Controller → Service → Repository → DbContext → Database
-```
-
-### Layer Responsibilities
-
-* **Controller**
-
-  * Handles HTTP requests & responses
-
-* **Service**
-
-  * Business logic
-  * Validation (e.g. time checks)
-
-* **Repository**
-
-  * Database operations via EF Core
-
-* **DTOs**
-
-  * Clean API input/output models
-
----
-
-## 📂 Project Structure
-
-```
-UserPunchApi/
+userPunch/
+├── UserPunchApi/                  # ASP.NET Core backend
+│   ├── Controllers/V1/            # Auth, Users, PunchRecords, Schedules, LeaveRequests, Departments
+│   ├── Services/
+│   │   ├── Interfaces/
+│   │   └── Implementations/
+│   ├── Repositories/
+│   │   ├── Interfaces/
+│   │   └── Implementations/
+│   ├── Models/                    # User, PunchRecord, Schedule, LeaveRequest, Department
+│   ├── Dtos/V1/                   # Input/output models per domain
+│   ├── Common/                    # Roles, status constants, ServiceResult
+│   ├── Data/                      # AppDbContext
+│   ├── Migrations/
+│   └── Program.cs
 │
-├── Controllers/
-│   └── V1/
-│       ├── UsersController.cs
-│       ├── SchedulesController.cs
-│       ├── PunchRecordsController.cs
-│       └── LeaveRequestsController.cs
-│
-├── Services/
-│   ├── Interfaces/
-│   └── Implementations/
-│
-├── Repositories/
-│   ├── Interfaces/
-│   └── Implementations/
-│
-├── Models/
-│   ├── User.cs
-│   ├── Schedule.cs
-│   ├── PunchRecord.cs
-│   └── LeaveRequest.cs
-│
-├── DTOs/
-│   └── V1/
-│
-├── Data/
-│   └── AppDbContext.cs
-│
-├── Migrations/
-└── Program.cs
+└── frontend/                      # React frontend
+    └── src/
+        ├── api/                   # axiosClient + one file per domain
+        ├── components/
+        │   ├── layout/            # AppLayout, Sidebar
+        │   └── common/            # ProtectedRoute, RoleRoute
+        ├── pages/                 # One file per page/route
+        ├── store/                 # authStore (Zustand)
+        ├── utils/                 # token.js, formatDate.js
+        └── styles/                # global.css
 ```
 
 ---
 
-## 🔌 API Overview
+## API Reference
 
-### Users
+### Auth — `/api/v1/auth`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | `/login` | Public | Email + password → JWT |
+| POST | `/register` | Public | Create account |
+| GET | `/me` | Authenticated | Current user info |
 
-```
-GET    /api/v1/users
-GET    /api/v1/users/{id}
-POST   /api/v1/users
-```
+### Punch Records — `/api/v1/punchrecords`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Manager | All records |
+| GET | `/user/{userId}` | Authenticated | Records for a user |
+| POST | `/punchin` | Authenticated | Clock in |
+| POST | `/punchout` | Authenticated | Clock out |
 
----
+### Leave Requests — `/api/v1/leaverequests`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Manager | All requests |
+| GET | `/my` | Authenticated | Own requests |
+| POST | `/` | Authenticated | Submit request |
+| PUT | `/{id}/approve` | Manager | Approve |
+| PUT | `/{id}/reject` | Manager | Reject |
 
-### Schedules
+### Schedules — `/api/v1/schedules`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Manager | All schedules |
+| GET | `/user/{userId}` | Authenticated | Schedules for a user |
+| POST | `/` | Manager | Create shift |
+| PUT | `/{id}` | Manager | Update shift |
+| DELETE | `/{id}` | Manager | Delete shift |
 
-```
-GET    /api/v1/schedules
-GET    /api/v1/schedules/{id}
-GET    /api/v1/schedules/user/{userId}
-
-POST   /api/v1/schedules
-PUT    /api/v1/schedules/{id}
-DELETE /api/v1/schedules/{id}
-```
-
----
-
-### Punch Records
-
-```
-GET    /api/v1/punchrecords
-GET    /api/v1/punchrecords/{id}
-
-POST   /api/v1/punchrecords
-PUT    /api/v1/punchrecords/{id}
-```
-
----
-
-### Leave Requests
-
-```
-GET    /api/v1/leaverequests
-GET    /api/v1/leaverequests/{id}
-
-POST   /api/v1/leaverequests
-PUT    /api/v1/leaverequests/{id}
-```
+### Users — `/api/v1/users`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Authenticated | All users |
+| GET | `/{id}` | Authenticated | User by ID |
+| POST | `/` | Manager | Create user |
+| PUT | `/{id}` | Manager | Update user |
+| DELETE | `/{id}` | Manager | Delete user |
 
 ---
 
-## 🧪 Example: Create Schedule
+## Frontend Routes
 
+| Route | Access | Page |
+|-------|--------|------|
+| `/login` | Public | Login |
+| `/dashboard` | Authenticated | Punch in/out + recent records |
+| `/leave-requests` | Authenticated | Leave request list + approval (managers) |
+| `/leave-requests/new` | Employee | Submit new leave request |
+| `/schedule` | Employee | Personal shift calendar |
+| `/admin/users` | Manager | User list |
+| `/admin/schedules` | Manager | Schedule management calendar |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 18+](https://nodejs.org/)
+
+### 1. Clone the repo
+```bash
+git clone <your-repo-url>
+cd userPunch
+```
+
+### 2. Configure the backend
+
+Edit `UserPunchApi/appsettings.json`:
 ```json
 {
-  "userId": 1,
-  "shiftDate": "2026-04-09T00:00:00",
-  "startTime": "2026-04-09T09:00:00",
-  "endTime": "2026-04-09T17:00:00",
-  "shiftName": "Morning Shift",
-  "createdByManagerId": 2
+  "Jwt": {
+    "Key": "replace-with-a-strong-secret-at-least-32-chars",
+    "Issuer": "UserPunchApi",
+    "Audience": "UserPunchApiUsers",
+    "ExpiryMinutes": 60
+  }
 }
 ```
 
----
-
-## ⚠️ Important Constraints
-
-* Foreign Keys:
-
-  * `UserId` must exist in Users table
-  * `CreatedByManagerId` must exist
-
-* Validation:
-
-  * `EndTime` must be greater than `StartTime`
-
----
-
-## 🔐 Security Considerations
-
-* DTO validation for input safety
-* Business rules enforced in Service layer
-* Planned improvements:
-
-  * JWT authentication
-  * Role-based authorization (Manager vs Employee)
-  * Data access control
-
-See `SECURITY.md` for vulnerability reporting.
-
----
-
-## 📦 Setup Instructions
-
-### 1. Clone repository
-
+### 3. Run the backend
 ```bash
-git clone <your-repo-url>
 cd UserPunchApi
-```
-
----
-
-### 2. Install dependencies
-
-```bash
 dotnet restore
-```
-
----
-
-### 3. Apply migrations
-
-```bash
 dotnet ef database update
-```
-
----
-
-### 4. Run the application
-
-```bash
 dotnet run
 ```
+API runs on `http://localhost:5007`  
+Swagger UI: `http://localhost:5007/swagger`
+
+### 4. Run the frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+App runs on `http://localhost:5173`
+
+> If Vite picks a different port, update the CORS origin in `UserPunchApi/Program.cs` to match.
 
 ---
 
-### 5. Open Swagger
+## Authentication
+
+- Login returns a JWT stored in `localStorage`
+- Axios automatically attaches `Authorization: Bearer <token>` on every request
+- 401 responses clear the session and redirect to `/login`
+- Two roles: **Employee** (default) and **Manager**
+- Role-based access enforced on both backend (`[Authorize(Roles)]`) and frontend (`RoleRoute`)
+
+---
+
+## Architecture
 
 ```
-http://localhost:5007/swagger
+HTTP Request
+    │
+    ▼
+Controller        ← validates input, extracts JWT claims
+    │
+    ▼
+Service           ← business logic, validation rules
+    │
+    ▼
+Repository        ← EF Core queries
+    │
+    ▼
+AppDbContext → SQLite
 ```
 
 ---
 
-## 🧠 Future Improvements
+## Potential Next Steps
 
-* Schedule conflict detection (no overlapping shifts)
-* Full role-based access control
-* JWT authentication
-* React frontend implementation
-* Cloud deployment (Azure / AWS)
-* Notification system
-
----
-
-## 📄 License
-
-MIT License
+- Shift conflict detection (prevent overlapping schedules)
+- Pagination on long lists
+- Email/push notifications for leave approvals
+- Reporting & analytics dashboard
+- Cloud deployment (Azure App Service + Azure SQL)
+- Refresh token rotation
+- Docker support
 
 ---
 
-## 👨‍💻 Author
+## Author
 
-Pengyu Liu
+**Pengyu Liu**
 
 ---
 
-## ⭐ Project Goal
+## License
 
-This project demonstrates:
-
-* Clean backend architecture (Controller / Service / Repository)
-* RESTful API design
-* Entity relationships & database modeling
-* Scalable system structure for real-world applications
+MIT
