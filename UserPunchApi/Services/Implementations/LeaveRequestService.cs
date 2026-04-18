@@ -30,6 +30,20 @@ namespace UserPunchApi.Services.Implementations
             });
         }
 
+        public async Task<IEnumerable<LeaveRequestResponseDto>> GetMyLeaveRequestsAsync(long userId)
+        {
+            var leaveRequests = await _leaveRequestRepository.GetByUserIdAsync(userId);
+            return leaveRequests.Select(l => new LeaveRequestResponseDto
+            {
+                LeaveRequestId = l.LeaveRequestId,
+                UserId = l.UserId,
+                StartDate = l.StartDate,
+                EndDate = l.EndDate,
+                LeaveReason = l.LeaveReason.ToString(),
+                Status = l.Status
+            });
+        }
+
         public async Task<LeaveRequestResponseDto?> GetLeaveRequestByIdAsync(long id)
         {
             var leaveRequest = await _leaveRequestRepository.GetLeaveRequestByIdAsync(id);
