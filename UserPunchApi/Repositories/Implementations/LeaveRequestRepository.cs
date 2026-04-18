@@ -21,6 +21,13 @@ namespace UserPunchApi.Repositories.Implementations
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<LeaveRequest>> GetByUserIdAsync(long userId)
+        {
+            return await _context.LeaveRequests
+                .Where(l => l.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<LeaveRequest?> GetLeaveRequestByIdAsync(long id)
         {
             return await _context.LeaveRequests

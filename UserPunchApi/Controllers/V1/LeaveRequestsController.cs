@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserPunchApi.Common;
@@ -27,6 +28,19 @@ namespace UserPunchApi.Controllers.V1
             return Ok(requests);
         }
 
+        // Employees fetch only their own leave requests.
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyLeaveRequests()
+        {
+            var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? User.FindFirst("sub")?.Value;
+            if (sub == null || !long.TryParse(sub, out var userId))
+                return Unauthorized();
+
+            var requests = await _leaveRequestService.GetMyLeaveRequestsAsync(userId);
+            return Ok(requests);
+        }
+
         // Both roles can look up a specific leave request by id.
         [HttpGet("{id}")]
         public async Task<IActionResult> GetLeaveRequestById(long id)
@@ -40,6 +54,12 @@ namespace UserPunchApi.Controllers.V1
         [HttpPost]
         public async Task<IActionResult> CreateLeaveRequest([FromBody] CreateLeaveRequestDto dto)
         {
+            var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? User.FindFirst("sub")?.Value;
+            if (sub == null || !long.TryParse(sub, out var userId))
+                return Unauthorized();
+
+            dto.UserId = userId;
             var created = await _leaveRequestService.CreateLeaveRequestAsync(dto);
             return CreatedAtAction(nameof(GetLeaveRequestById), new { id = created.LeaveRequestId }, created);
         }
