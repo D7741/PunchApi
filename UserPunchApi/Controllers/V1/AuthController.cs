@@ -89,6 +89,20 @@ namespace UserPunchApi.Controllers.V1
             return Ok(result);
         }
 
+        [HttpPost("google")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authService.GoogleLoginAsync(dto.Credential);
+
+            if (result == null)
+                return Unauthorized(new { message = "Invalid Google credential." });
+
+            return Ok(result);
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()

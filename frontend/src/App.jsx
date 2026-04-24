@@ -5,6 +5,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import RoleRoute from './components/common/RoleRoute';
 
 import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 import LeaveRequestListPage from './pages/LeaveRequestListPage';
 import NewLeaveRequestPage from './pages/NewLeaveRequestPage';
@@ -19,6 +20,7 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/not-authorized" element={<NotAuthorizedPage />} />
 
         {/* Protected — requires login, renders inside AppLayout */}
