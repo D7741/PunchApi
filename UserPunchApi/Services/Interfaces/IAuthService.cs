@@ -9,6 +9,7 @@ namespace UserPunchApi.Services.Interfaces
         Task<AuthResponseDto> RegisterAsync(RegisterDto dto);
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto dto);
         Task<User?> GetByEmailAsync(string email);
+        Task<AuthResponseDto?> GoogleLoginAsync(string credential);
     }
  
 }

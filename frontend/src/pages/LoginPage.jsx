@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../api/authApi';
+import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
+import { login, googleAuth } from '../api/authApi';
 import useAuthStore from '../store/authStore';
 
 export default function LoginPage() {
@@ -12,6 +13,21 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await googleAuth(credentialResponse.credential);
+      const { accessToken, userId, fullName, email: userEmail, role } = res.data;
+      loginStore(accessToken, { id: userId, fullName, email: userEmail, role });
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Google sign-in failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -20,7 +36,6 @@ export default function LoginPage() {
     try {
       const res = await login({ email, password });
       const { accessToken, userId, fullName, email: userEmail, role } = res.data;
-
       loginStore(accessToken, { id: userId, fullName, email: userEmail, role });
       navigate('/dashboard');
     } catch (err) {
@@ -36,6 +51,17 @@ export default function LoginPage() {
       <div className="card" style={styles.card}>
         <h1 style={styles.title}>UserPunch</h1>
         <p style={styles.subtitle}>Employee Attendance System</p>
+
+        <div style={styles.googleWrapper}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google sign-in failed.')}
+            width="340"
+            text="continue_with"
+          />
+        </div>
+
+        <div style={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -76,6 +102,11 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <p style={styles.footer}>
+          Don&apos;t have an account?{' '}
+          <Link to="/signup" style={styles.link}>Sign up</Link>
+        </p>
       </div>
     </div>
   );
@@ -102,7 +133,32 @@ const styles = {
   subtitle: {
     color: 'var(--color-text-muted)',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     fontSize: 13,
+  },
+  googleWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  divider: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+    color: 'var(--color-text-muted)',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  footer: {
+    textAlign: 'center',
+    marginTop: 16,
+    fontSize: 13,
+    color: 'var(--color-text-muted)',
+  },
+  link: {
+    color: 'var(--color-primary, #4f46e5)',
+    textDecoration: 'none',
+    fontWeight: 500,
   },
 };
